@@ -145,7 +145,7 @@ echo'
     
         <div class="mb-3">
         <label for="members" class="form-label">Select Team Members</label><br>
-        <select  size="1" name="members[]" multiple style="padding: 10px; background:#edf2ff; border:none;">
+        <select  name="members[]" multiple style="padding: 10px; background:#edf2ff; border:none;">
         <option value="">-- Select Members -- </option>';
         for ($x = 0; $x < $username_count; $x++) {
         echo' <option value='.$list_of_usernames[$x].'>'.$list_of_usernames[$x].'</option>';
@@ -258,7 +258,7 @@ while ($row2 = mysqli_fetch_array($result2)) {
 
      ///projects table
 
-     $result11 = mysqli_query($db, "SELECT * FROM project, project_members where project.id=project_members.project_id and project_members.member_name='$username'");
+     $result11 = mysqli_query($db, "SELECT * FROM project, project_members where project.id=project_members.project_id and project_members.member_name='$username'  and status='active'");
 echo '		<div class="container">
 <div class="row justify-content-center">
   <div class="col-md-6 text-center mb-5">

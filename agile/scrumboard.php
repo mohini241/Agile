@@ -84,7 +84,7 @@ if ($_SESSION['usertype']=='scrummaster' || $_SESSION['usertype']=='teammember' 
 $id=$_GET['id'];
 
 
-$project_info = mysqli_query($db, "SELECT * FROM project, project_members where project.id=project_members.project_id and project_members.member_name='$username' and project.id='$id'");
+$project_info = mysqli_query($db, "SELECT * FROM project, project_members where project.id=project_members.project_id and project_members.member_name='$username' and project.id='$id' ");
 
     while ($project_info_array = mysqli_fetch_array($project_info)) 
     {
@@ -269,20 +269,75 @@ $sprint_name = "SELECT sprint_name from sprint";
                   
     <h2 style="color:white;">User Stories ';
     $list_of_story=array();
+    $list_of_story_id=array();
 
-    $story_name = "SELECT story_name from user_story";
+    $story_name = "SELECT story_name,story_id from user_story where story_status='Backlog' ";
       $story_result = mysqli_query($db, $story_name);
       while($story_array = mysqli_fetch_assoc($story_result)){
         $list_of_story[]=$story_array['story_name'];
+        $list_of_story_id[]=$story_array['story_id'];
     
       }
     
-      //  print_r($list_of_story);
+       // print_r($list_of_story_id);
        $story_count=count($list_of_story);
       //  echo $story_count;
+//////////////////////////todo///////////////////////
+$list_of_todo=array();
+$list_of_todo_priority=array();
+$list_of_todo_category=array();
+$todo_name = "SELECT story_name,story_priority,story_category from user_story where story_status='ToDo' ";
+  $todo_result = mysqli_query($db, $todo_name);
+  while($todo_array = mysqli_fetch_assoc($todo_result)){
+    $list_of_todo[]=$todo_array['story_name'];
+    $list_of_todo_priority[]=$todo_array['story_priority'];
+    $list_of_todo_category[]=$todo_array['story_category'];
+
+  }
+  $list_of_todo_count=count($list_of_todo);
+  //////////////////////////in-progress///////////////////////
+$list_of_inprogress=array();
+$list_of_inprogress_priority=array();
+$list_of_inprogress_category=array();
+$inprogress_name = "SELECT story_name,story_priority,story_category from user_story where story_status='InProgress' ";
+  $inprogress_result = mysqli_query($db, $inprogress_name);
+  while($inprogress_array = mysqli_fetch_assoc($inprogress_result)){
+    $list_of_inprogress[]=$inprogress_array['story_name'];
+    $list_of_inprogress_priority[]=$inprogress_array['story_priority'];
+    $list_of_inprogress_category[]=$inprogress_array['story_category'];
+
+  }
+  $list_of_inprogress_count=count($list_of_inprogress);
+ //////////////////////////completed///////////////////////
+$list_of_completed=array();
+$list_of_completed_priority=array();
+$list_of_completed_category=array();
+$completed_name = "SELECT story_name,story_priority,story_category from user_story where story_status='Completed' ";
+  $completed_result = mysqli_query($db, $completed_name);
+  while($completed_array = mysqli_fetch_assoc($completed_result)){
+    $list_of_completed[]=$completed_array['story_name'];
+    $list_of_completed_priority[]=$completed_array['story_priority'];
+    $list_of_completed_category[]=$completed_array['story_category'];
+
+  }
+  $list_of_completed_count=count($list_of_completed);
+  //////////////////////////accepted///////////////////////
+$list_of_accepted=array();
+$list_of_accepted_priority=array();
+$list_of_accepted_category=array();
+$accepted_name = "SELECT story_name,story_priority,story_category from user_story where story_status='Accepted' ";
+  $accepted_result = mysqli_query($db, $accepted_name);
+  while($accepted_array = mysqli_fetch_assoc($accepted_result)){
+    $list_of_accepted[]=$accepted_array['story_name'];
+    $list_of_accepted_priority[]=$accepted_array['story_priority'];
+    $list_of_accepted_category[]=$accepted_array['story_category'];
+
+  }
+  $list_of_accepted_count=count($list_of_accepted);
+  //////////////////////////////////////////////////////////////////////////////
     echo'
-    <select class="change_sprint" style="
-    transform: translateX(75%);
+    <select class="select_story" style="
+    transform: translateX(86%);
       display: inline;
       height: 34px;
       padding: 6px 12px;
@@ -293,22 +348,22 @@ $sprint_name = "SELECT sprint_name from sprint";
       background-image: none;
       border: 1px solid #ccc;
       border-radius: 4px;"
-      name="sprint_select" id="sprint_select">
+      name="select_story" id="select_story">
         <option disabled selected>--Select Story--</option>';
         for ($x = 0; $x < $story_count; $x++) {
-          echo' <option value='.$list_of_story[$x].'>'.$list_of_story[$x].'</option>';
+          echo' <option value='.$list_of_story_id[$x].'>'.$list_of_story[$x].'</option>';
           }
           echo'
     </select>
     <p style="float:right; transform: translateX(-833%); text-transform:capitalize; " id="sprint_display"> </p>
     </h2>
+    <p id="story_display"> </p>
     
-    
-    <div class="column" style="display: inline-block; width:300px;">';
+    <div class="column" style="display: inline-block; width:300px; height:500px; overflow:auto; overflow-x:hidden;">';
    
 
 
-    $story_info = mysqli_query($db, "SELECT * FROM user_story where project_id='$id'");
+    $story_info = mysqli_query($db, "SELECT * FROM user_story where project_id='$id' and story_status='Backlog'");
 
     while ($story_info_array = mysqli_fetch_array($story_info)) 
     {
@@ -335,18 +390,9 @@ echo'
     </div>
     </div>
     <br>
-                
-                
-                
-                
                 </div>
             </div>
             
-
-
-
-  
-
         </div>
 
    
@@ -354,8 +400,8 @@ echo'
 
     }
 
-    echo ' </div> <div class="column" style="display: inline-block;  transform: translateX(10%);
-    transform: translateY(-584%) !important;">
+    echo ' </div> </br><div class="column" style="display:block; 
+    ">
    
 
 
@@ -368,11 +414,64 @@ echo'
     <th>In Progress</th>
     <th>Completed</th>
     <th>Accepted</th>
-    
-    </tr>
     </thead>
-    <tbody>
+    </tr>
     
+    
+    <tbody>
+    <td>';
+    for ($x = 0; $x < $list_of_todo_count; $x++) {
+      echo'<div class="card" style="width: 18rem; border:none;">
+      <img style="background-color:#f4f6fc;"src="todo.png" class="card-img-top" alt="...">
+      <div class="card-body" style="padding:0rem !important;">
+              
+        <p class="card-text centered"><strong>';echo $list_of_todo[$x];echo'</strong></br>'.$list_of_todo_priority[$x];echo'</br>'.$list_of_todo_category[$x];echo'</p>
+      </div>
+    </div> ';
+      }
+      echo'
+
+
+</td>
+
+<td>';
+for ($x = 0; $x < $list_of_inprogress_count; $x++) {
+   echo' <div class="card" style="width: 18rem;  border:none;">
+  <img style="background-color: #ffffff;" src="inprogress.png" class="card-img-top" alt="...">
+  <div class="card-body" style="padding:0rem !important;">
+    <p class="card-text centered"><strong>';echo $list_of_inprogress[$x];echo'</strong></br>'.$list_of_inprogress_priority[$x];echo'</br>'.$list_of_inprogress_category[$x];echo'</p>
+  </div>
+</div>';
+}
+echo'
+</td>
+
+<td>';
+for ($x = 0; $x < $list_of_completed_count; $x++) {
+  echo'
+<div class="card" style="width: 18rem;  border:none;">
+<img style="background-color:#f4f6fc;" src="completed.png" class="card-img-top" alt="...">
+<div class="card-body" style="padding:0rem !important;">
+  <p class="card-text centered"><strong>';echo $list_of_completed[$x];echo'</strong></br>'.$list_of_completed_priority[$x];echo'</br>'.$list_of_completed_category[$x];echo'</p>
+</div>
+</div>';
+}
+echo'
+</td>
+
+<td>';
+for ($x = 0; $x < $list_of_accepted_count; $x++) {
+  echo'
+<div class="card" style="width: 18rem;  border:none;">
+<img style="background-color:#ffffff;" src="accepted.png" class="card-img-top" alt="...">
+<div class="card-body" style="padding:0rem !important;">
+  <p class="card-text centered"><strong>';echo $list_of_accepted[$x];echo'</strong></br>'.$list_of_accepted_priority[$x];echo'</br>'.$list_of_accepted_category[$x];echo'</p>
+</div>
+</div>';
+}
+echo'
+</td>
+</td>
     
     </div>
 </div>';
@@ -401,7 +500,28 @@ echo'
    
 });
 
-console.log("Hello world!");
+});
+
+
+$('#select_story').change(function(){
+      var story = $(this).val();
+      
+      $.ajax({
+       url:'fetch_story.php',
+        type:'POST',
+       data:{value:story},
+        dataType:'JSON',
+        success:function(data) {
+           
+            $("#story_display").html(data);
+            location.reload();
+            alert(data);
+            
+        }
+        
+   
+});
+
 });
    });
 
@@ -419,7 +539,7 @@ console.log("Hello world!");
         background-image: url('https://nmrql.com/wp-content/uploads/2017/11/shutterstock_695385187-scaled.jpg');
 background-color: #d7edef;
 background-size: cover;
-background-repeat: no-repeat;
+background-repeat: repeat;
       /* background-image: url('https://thumbs.dreamstime.com/b/agile-concept-blurred-city-lights-agile-concept-blurred-city-abstract-lights-background-157530337.jpg'); */
       /* repeat:no-repeat fixed center; background-color: #000000; background-size: cover;
       background-color: rgba(255, 255, 255, -2.514);
@@ -501,5 +621,18 @@ background-repeat: no-repeat;
   margin-left:10px;
   
  }
+ .column {
+  float: left;
+  width: 50%;
+  padding: 10px;
+  height: 300px; /* Should be removed. Only for demonstration */
+}
+
+.centered{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
   </style>
  </html>
